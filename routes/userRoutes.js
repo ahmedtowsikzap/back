@@ -102,35 +102,40 @@ router.get('/', async (req, res) => {
 });
   
 
-  router.post('/create', async (req, res) => {
-    const { username, password, role } = req.body;
-  
-    // Validate input
-    if (!username || !password || !role) {
-      return res.status(400).json({ message: "Username, password, and role are required" });
+router.post('/create', async (req, res) => {
+  const { username, password, role, requestorRole } = req.body;
+
+  // Validate input
+  if (!username || !password || !role || !requestorRole) {
+    return res.status(400).json({ message: "Username, password, role, and requestorRole are required" });
+  }
+
+  // Ensure only CEO can create new users
+  if (requestorRole !== 'CEO') {
+    return res.status(403).json({ message: "Permission denied: Only a CEO can create new users" });
+  }
+
+  const validRoles = ['CEO', 'Manager', 'User'];
+  if (!validRoles.includes(role)) {
+    return res.status(400).json({ message: `Invalid role provided. Allowed roles are: ${validRoles.join(', ')}` });
+  }
+
+  try {
+    // Check if the username already exists
+    const existingUser = await User.findOne({ username });
+    if (existingUser) {
+      return res.status(400).json({ message: "Username already exists" });
     }
-  
-    const validRoles = ['CEO', 'Manager', 'User'];
-    if (!validRoles.includes(role)) {
-      return res.status(400).json({ message: `Invalid role provided. Allowed roles are: ${validRoles.join(', ')}` });
-    }
-  
-    try {
-      // Check for existing user
-      const existingUser = await User.findOne({ username });
-      if (existingUser) {
-        return res.status(400).json({ message: "Username already exists" });
-      }
-  
-      // Create and save user
-      const user = new User({ username, password, role });
-      await user.save();
-  
-      res.status(200).json({ message: 'User created successfully' });
-    } catch (error) {
-      console.error('Error during user creation:', error);
-      res.status(500).json({ message: "Server error while creating user" });
-    }
-  });
+
+    // Create and save the new user
+    const user = new User({ username, password, role });
+    await user.save();
+
+    res.status(200).json({ message: 'User created successfully' });
+  } catch (error) {
+    console.error('Error during user creation:', error);
+    res.status(500).json({ message: "Server error while creating user" });
+  }
+});
 
 module.exports = router;

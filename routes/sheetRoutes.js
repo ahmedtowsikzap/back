@@ -104,6 +104,43 @@ router.post('/create', async (req, res) => {
   }
 });
 
+
+// Delete a sheet by ObjectId with role validation
+// Delete a sheet by ObjectId with role validation
+router.delete('/:id', async (req, res) => {
+  const { id } = req.params; // Extract ObjectId from the URL
+  const { role: requestorRole } = req.body; // Requestor's role
+
+  console.log('DELETE request received for ObjectId:', id, 'with role:', requestorRole);
+
+  try {
+    // Validate requestor role
+    if (!['CEO', 'Manager'].includes(requestorRole)) {
+      return res.status(403).json({ message: 'Permission denied: Only CEO or Manager can delete sheets.' });
+    }
+
+    // Find and delete the sheet by its ObjectId
+    const sheet = await Sheet.findByIdAndDelete(id);
+
+    if (!sheet) {
+      return res.status(404).json({ message: 'Sheet not found.' });
+    }
+
+    // Remove the sheet reference from users' assignedSheets
+    await User.updateMany(
+      { assignedSheets: sheet._id },
+      { $pull: { assignedSheets: sheet._id } }
+    );
+
+    res.status(200).json({ message: 'Sheet deleted successfully.' });
+  } catch (error) {
+    console.error('Error deleting sheet:', error);
+    res.status(500).json({ message: 'Failed to delete sheet.', error: error.message });
+  }
+});
+
+
+
 // Get all sheets
 router.get('/', async (req, res) => {
   try {
