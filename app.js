@@ -12,7 +12,10 @@ const sheetRoutes = require('./routes/sheetRoutes');
 const app = express();
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: 'http://localhost:5173', // Replace with your frontend's URL
+}));
+
 app.use(bodyParser.json());
 
 // MongoDB connection

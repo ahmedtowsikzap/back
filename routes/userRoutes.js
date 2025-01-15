@@ -31,6 +31,68 @@ router.post('/login', async (req, res) => {
       res.status(500).json({ message: "Server error" });
     }
   });
+
+  router.get('/auth/me', async (req, res) => {
+    const { username } = req.query; // Example: Pass username as a query parameter
+  
+    if (!username) {
+      return res.status(400).json({ message: "Username is required" });
+    }
+  
+    try {
+      const user = await User.findOne({ username });
+  
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+  
+      res.status(200).json({
+        username: user.username,
+        role: user.role,
+      });
+    } catch (error) {
+      console.error('Error fetching user data:', error);
+      res.status(500).json({ message: "Server error while fetching user data" });
+    }
+  });
+
+  // @route   GET /api/users/me
+router.get('/me', async (req, res) => {
+  const { username } = req.query; // Example: Pass username as a query parameter
+
+  if (!username) {
+    return res.status(400).json({ message: "Username is required" });
+  }
+
+  try {
+    const user = await User.findOne({ username });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.status(200).json({
+      username: user.username,
+      role: user.role,
+    });
+  } catch (error) {
+    console.error('Error fetching user data:', error);
+    res.status(500).json({ message: "Server error while fetching user data" });
+  }
+});
+
+
+
+  // Get all users route
+router.get('/', async (req, res) => {
+  try {
+    const users = await User.find(); // Fetch all users from the database
+    res.status(200).json(users); // Send the users as a response
+  } catch (error) {
+    console.error('Error fetching users:', error);
+    res.status(500).json({ message: "Server error while fetching users" });
+  }
+});
   
 
   router.post('/create', async (req, res) => {
