@@ -3,36 +3,43 @@ const User = require('../models/User');
 const router = express.Router();
 
 // Admin login route with error handling
+// Admin login route with error handling
 router.post('/login', async (req, res) => {
-    const { username, password } = req.body;
-  
-    // Validate input
-    if (!username || !password) {
-      return res.status(400).json({ message: "Username and password are required" });
-    }
-  
-    try {
-      const user = await User.findOne({ username });
-  
-      // User not found
-      if (!user) {
-        return res.status(400).json({ message: "User not found" });
-      }
-  
-      // Validate password
-      if (user.password !== password) {
-        return res.status(400).json({ message: "Invalid credentials" });
-      }
-  
-      // Return success with user role
-      res.status(200).json({ message: 'Login successful', role: user.role });
-    } catch (error) {
-      console.error('Error during login:', error);
-      res.status(500).json({ message: "Server error" });
-    }
-  });
+  const { username, password } = req.body;
 
-  router.get('/auth/me', async (req, res) => {
+  // Validate input
+  if (!username || !password) {
+    return res.status(400).json({ message: "Username and password are required" });
+  }
+
+  try {
+    const user = await User.findOne({ username });
+
+    // User not found
+    if (!user) {
+      return res.status(400).json({ message: "User not found" });
+    }
+
+    // Validate password
+    if (user.password !== password) {
+      return res.status(400).json({ message: "Invalid credentials" });
+    }
+
+    // Return success with user role, username, and userId
+    res.status(200).json({
+      message: 'Login successful',
+      role: user.role,
+      userId: user._id, // Add userId to the response
+      username: user.username // Add username to the response
+    });
+  } catch (error) {
+    console.error('Error during login:', error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+
+  router.get('/api/me', async (req, res) => {
     const { username } = req.query; // Example: Pass username as a query parameter
   
     if (!username) {
