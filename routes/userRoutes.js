@@ -105,29 +105,27 @@ router.get('/', async (req, res) => {
 router.post('/create', async (req, res) => {
   const { username, password, role, requestorRole } = req.body;
 
-  // Validate input
-  if (!username || !password || !role || !requestorRole) {
-    return res.status(400).json({ message: "Username, password, role, and requestorRole are required" });
-  }
+  console.log("Request body:", req.body); // Debugging request data
 
-  // Ensure only CEO can create new users
-  if (requestorRole !== 'CEO') {
-    return res.status(403).json({ message: "Permission denied: Only a CEO can create new users" });
-  }
+  // if (!username || !password || !role || !requestorRole) {
+  //   return res.status(400).json({ message: "Username, password, role, and requestorRole are required" });
+  // }
 
-  const validRoles = ['CEO', 'Manager', 'User'];
-  if (!validRoles.includes(role)) {
-    return res.status(400).json({ message: `Invalid role provided. Allowed roles are: ${validRoles.join(', ')}` });
-  }
+  // if (requestorRole !== 'CEO') {
+  //   return res.status(403).json({ message: "Permission denied: Only a CEO can create new users" });
+  // }
+
+  // const validRoles = ['CEO', 'Manager', 'User'];
+  // if (!validRoles.includes(role)) {
+  //   return res.status(400).json({ message: `Invalid role provided. Allowed roles are: ${validRoles.join(', ')}` });
+  // }
 
   try {
-    // Check if the username already exists
     const existingUser = await User.findOne({ username });
     if (existingUser) {
       return res.status(400).json({ message: "Username already exists" });
     }
 
-    // Create and save the new user
     const user = new User({ username, password, role });
     await user.save();
 
@@ -137,5 +135,6 @@ router.post('/create', async (req, res) => {
     res.status(500).json({ message: "Server error while creating user" });
   }
 });
+
 
 module.exports = router;
