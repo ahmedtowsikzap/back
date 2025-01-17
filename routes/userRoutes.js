@@ -30,7 +30,8 @@ router.post('/login', async (req, res) => {
       message: 'Login successful',
       role: user.role,
       userId: user._id, // Add userId to the response
-      username: user.username // Add username to the response
+      username: user.username, // Add username to the response
+      designation: user.designation
     });
   } catch (error) {
     console.error('Error during login:', error);
@@ -56,6 +57,7 @@ router.post('/login', async (req, res) => {
       res.status(200).json({
         username: user.username,
         role: user.role,
+        designation: user.designation
       });
     } catch (error) {
       console.error('Error fetching user data:', error);
@@ -81,6 +83,7 @@ router.get('/me', async (req, res) => {
     res.status(200).json({
       username: user.username,
       role: user.role,
+      designation: user.designation
     });
   } catch (error) {
     console.error('Error fetching user data:', error);
@@ -103,7 +106,7 @@ router.get('/', async (req, res) => {
   
 
 router.post('/create', async (req, res) => {
-  const { username, password, role, requestorRole } = req.body;
+  const { username, password, role, designation,  requestorRole } = req.body;
 
   console.log("Request body:", req.body); // Debugging request data
 
@@ -126,7 +129,7 @@ router.post('/create', async (req, res) => {
       return res.status(400).json({ message: "Username already exists" });
     }
 
-    const user = new User({ username, password, role });
+    const user = new User({ username, password, role, designation  });
     await user.save();
 
     res.status(200).json({ message: 'User created successfully' });

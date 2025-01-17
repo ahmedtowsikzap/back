@@ -7,6 +7,7 @@ const userSchema = new mongoose.Schema({
   role: { type: String, required: true, enum: ['CEO', 'Manager', 'User'] },
   assignedSheets: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Sheet' }],
   uid: { type: String, unique: true, default: () => uuid.v4() }, // Automatically generate a unique uid
+  designation: { type: String, default: null }, // Add optional designation field
 });
 
 const User = mongoose.model('User', userSchema);
