@@ -85,16 +85,16 @@ router.get('/user/:userId', async (req, res) => {
 
 // Create a new sheet
 router.post('/create', async (req, res) => {
-  const { sheetUrl } = req.body;
+  const { sheetUrl, sheetName } = req.body;
 
   // Validate input
-  if (!sheetUrl) {
+  if (!sheetUrl || !sheetName) {
     return res.status(400).json({ message: 'Sheet URL is required' });
   }
 
   try {
     // Save sheet to database
-    const sheet = new Sheet({ sheetUrl });
+    const sheet = new Sheet({ sheetName, sheetUrl });
     await sheet.save();
 
     res.status(200).json({ message: 'Sheet created successfully', sheet });
