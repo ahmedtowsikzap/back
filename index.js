@@ -39,6 +39,10 @@ connectDB();
 app.use('/api/users', userRoutes);
 app.use('/api/sheets', sheetRoutes);
 
+app.get('/', (req, res) => {
+
+  res.send("server is running")
+})
 // Start server
 const PORT = 5000;
 app.listen(PORT, () => {
